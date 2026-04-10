@@ -36,10 +36,10 @@ const TOOLTIP_STYLE = {
 };
 
 export default function App() {
-  const [selected, setSelected]   = useState(STOCKS[0]);
+  const [selected, setSelected] = useState(STOCKS[0]);
   const [stockData, setStockData] = useState(null);
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,9 +56,9 @@ export default function App() {
         if (cancelled) return;
         const chartData = data.actual.map((val, i) => ({
           time: indexToTime(i),
-          Actual:    +val.toFixed(2),
+          Actual: +val.toFixed(2),
           Predicted: +data.predicted[i].toFixed(2),
-          Delta:     +(Math.abs(val - data.predicted[i])).toFixed(2),
+          Delta: +(Math.abs(val - data.predicted[i])).toFixed(2),
         }));
         setStockData({ ...data, chartData });
       })
@@ -114,7 +114,7 @@ export default function App() {
           </div>
           <div className="panel-body">
             {loading && <div className="state-msg">Loading…</div>}
-            {error   && <div className="state-msg error">{error}</div>}
+            {error && <div className="state-msg error">{error}</div>}
             {stockData && (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={stockData.chartData} margin={{ top: 12, right: 16, left: 0, bottom: 4 }}>
@@ -122,7 +122,7 @@ export default function App() {
                   <XAxis {...XAXIS_PROPS} />
                   <YAxis {...YAXIS_PROPS} />
                   <Tooltip {...TOOLTIP_STYLE} />
-                  <Line dataKey="Actual"    stroke="#ffffff" strokeWidth={1.5} dot={false} activeDot={{ r: 3, fill: '#fff', strokeWidth: 0 }} />
+                  <Line dataKey="Actual" stroke="#ffffff" strokeWidth={1.5} dot={false} activeDot={{ r: 3, fill: '#fff', strokeWidth: 0 }} />
                   <Line dataKey="Predicted" stroke="#4d94ff" strokeWidth={1.5} strokeDasharray="5 3" dot={false} activeDot={{ r: 3, fill: '#4d94ff', strokeWidth: 0 }} />
                 </LineChart>
               </ResponsiveContainer>
@@ -138,13 +138,13 @@ export default function App() {
           </div>
           <div className="panel-body">
             {loading && <div className="state-msg">Loading…</div>}
-            {error   && <div className="state-msg error">{error}</div>}
+            {error && <div className="state-msg error">{error}</div>}
             {stockData && (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={stockData.chartData} margin={{ top: 12, right: 16, left: 0, bottom: 4 }}>
                   <defs>
                     <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor="#ffffff" stopOpacity={0.20} />
+                      <stop offset="5%" stopColor="#ffffff" stopOpacity={0.20} />
                       <stop offset="95%" stopColor="#ffffff" stopOpacity={0} />
                     </linearGradient>
                   </defs>
