@@ -19,6 +19,17 @@
   --font: 'Plus Jakarta Sans', sans-serif;
 }
 
+body.light-mode {
+  --black: #f8f9fa;
+  --off-black: #ffffff;
+  --panel: #ffffff;
+  --border: #e0e0e0;
+  --border-mid: #d0d0d0;
+  --white: #111111;
+  --muted: #666666;
+  --accent: #0056b3;
+}
+
 html {
   height: 100%;
 }
@@ -42,6 +53,25 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--border-mid);
+  color: var(--white);
+  font-size: 1rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--white);
+  background: var(--off-black);
 }
 
 /* ─── TOPBAR ─────────────────────────────────────────────── */
@@ -114,7 +144,7 @@ body {
 }
 
 .stock-select option {
-  background: #111;
+  background: var(--black);
   color: var(--white);
 }
 
@@ -249,7 +279,7 @@ body {
 }
 
 .stat-cell {
-  background: #0a0a0a;
+  background: var(--off-black);
   padding: 1rem 1.2rem;
   display: flex;
   flex-direction: column;
@@ -279,7 +309,7 @@ body {
 }
 
 .stats-empty {
-  background: #0a0a0a;
+  background: var(--off-black);
   grid-column: 1 / -1;
   display: flex;
   align-items: center;

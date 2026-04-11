@@ -22,24 +22,49 @@ function indexToTime(i) {
   return `${h12}:${m.toString().padStart(2, '0')} ${period}`;
 }
 
-const TOOLTIP_STYLE = {
-  contentStyle: {
-    background: '#0a0a0a',
-    border: '1px solid #222',
-    borderRadius: 0,
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 11,
-    color: '#fff',
-  },
-  labelStyle: { color: '#555', marginBottom: 4 },
-  itemStyle: { color: '#fff' },
-};
-
 export default function App() {
   const [selected, setSelected] = useState(STOCKS[0]);
   const [stockData, setStockData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isLightMode, setIsLightMode] = useState(false);
+
+  useEffect(() => {
+    if (isLightMode) {
+      document.body.classList.add('light-mode');
+    } else {
+      document.body.classList.remove('light-mode');
+    }
+  }, [isLightMode]);
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const actual = payload[0]?.payload?.Actual;
+      const predicted = payload[0]?.payload?.Predicted;
+      let percentOff = '0.00';
+      if (actual && predicted) {
+        percentOff = ((Math.abs(actual - predicted) / actual) * 100).toFixed(2);
+      }
+
+      return (
+        <div style={{
+          background: isLightMode ? '#ffffff' : '#0a0a0a',
+          border: `1px solid ${isLightMode ? '#e0e0e0' : '#222'}`,
+          borderRadius: 0,
+          padding: '10px',
+          fontFamily: 'Plus Jakarta Sans, sans-serif',
+          fontSize: 11,
+          boxShadow: isLightMode ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+        }}>
+          <p style={{ margin: 0, color: isLightMode ? '#666' : '#555', marginBottom: 4 }}>{label}</p>
+          <p style={{ margin: 0, color: isLightMode ? '#111' : '#fff', paddingBottom: 2 }}>Actual : {actual}</p>
+          <p style={{ margin: 0, color: isLightMode ? '#111' : '#fff' }}>Predicted : {predicted}</p>
+          <p style={{ margin: 0, color: isLightMode ? '#0056b3' : '#4d94ff', marginTop: 4 }}>% Off : {percentOff}%</p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -68,16 +93,21 @@ export default function App() {
     return () => { cancelled = true; };
   }, [selected]);
 
+  const chartStroke = isLightMode ? '#e0e0e0' : '#1e1e1e';
+  const chartTick = isLightMode ? '#666' : '#444';
+  const lineActual = isLightMode ? '#111111' : '#ffffff';
+  const linePredicted = isLightMode ? '#0056b3' : '#4d94ff';
+
   const XAXIS_PROPS = {
     dataKey: 'time',
-    stroke: '#1e1e1e',
-    tick: { fill: '#444', fontSize: 10, fontFamily: 'Plus Jakarta Sans' },
+    stroke: chartStroke,
+    tick: { fill: chartTick, fontSize: 10, fontFamily: 'Plus Jakarta Sans' },
     minTickGap: 60,
     interval: 'preserveStartEnd',
   };
   const YAXIS_PROPS = {
-    stroke: '#1e1e1e',
-    tick: { fill: '#444', fontSize: 10, fontFamily: 'Plus Jakarta Sans' },
+    stroke: chartStroke,
+    tick: { fill: chartTick, fontSize: 10, fontFamily: 'Plus Jakarta Sans' },
     domain: ['auto', 'auto'],
     width: 70,
   };
@@ -92,6 +122,13 @@ export default function App() {
           <span className="brand-sub">360-Min Prediction Verifier</span>
         </div>
         <div className="topbar-right">
+          <button 
+            className="theme-toggle" 
+            onClick={() => setIsLightMode(!isLightMode)}
+            title="Toggle Light/Dark Mode"
+          >
+            {isLightMode ? '🌙' : '☀️'}
+          </button>
           <span className="select-label">Stock</span>
           <select
             className="stock-select"
@@ -118,12 +155,12 @@ export default function App() {
             {stockData && (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={stockData.chartData} margin={{ top: 12, right: 16, left: 0, bottom: 4 }}>
-                  <CartesianGrid strokeDasharray="1 4" stroke="#111" vertical={false} />
+                  <CartesianGrid strokeDasharray="1 4" stroke={chartStroke} vertical={false} />
                   <XAxis {...XAXIS_PROPS} />
                   <YAxis {...YAXIS_PROPS} />
-                  <Tooltip {...TOOLTIP_STYLE} />
-                  <Line dataKey="Actual" stroke="#ffffff" strokeWidth={1.5} dot={false} activeDot={{ r: 3, fill: '#fff', strokeWidth: 0 }} />
-                  <Line dataKey="Predicted" stroke="#4d94ff" strokeWidth={1.5} strokeDasharray="5 3" dot={false} activeDot={{ r: 3, fill: '#4d94ff', strokeWidth: 0 }} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ stroke: chartStroke }} />
+                  <Line dataKey="Actual" stroke={lineActual} strokeWidth={1.5} dot={false} activeDot={{ r: 3, fill: lineActual, strokeWidth: 0 }} />
+                  <Line dataKey="Predicted" stroke={linePredicted} strokeWidth={1.5} strokeDasharray="5 3" dot={false} activeDot={{ r: 3, fill: linePredicted, strokeWidth: 0 }} />
                 </LineChart>
               </ResponsiveContainer>
             )}
@@ -144,21 +181,21 @@ export default function App() {
                 <AreaChart data={stockData.chartData} margin={{ top: 12, right: 16, left: 0, bottom: 4 }}>
                   <defs>
                     <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ffffff" stopOpacity={0.20} />
-                      <stop offset="95%" stopColor="#ffffff" stopOpacity={0} />
+                      <stop offset="5%" stopColor={lineActual} stopOpacity={isLightMode ? 0.35 : 0.20} />
+                      <stop offset="95%" stopColor={lineActual} stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="1 4" stroke="#111" vertical={false} />
+                  <CartesianGrid strokeDasharray="1 4" stroke={chartStroke} vertical={false} />
                   <XAxis {...XAXIS_PROPS} />
                   <YAxis {...YAXIS_PROPS} />
-                  <Tooltip {...TOOLTIP_STYLE} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ stroke: chartStroke }} />
                   <Area
                     dataKey="Actual"
-                    stroke="#ffffff"
+                    stroke={lineActual}
                     strokeWidth={1.5}
                     fill="url(#priceGrad)"
                     dot={false}
-                    activeDot={{ r: 3, fill: '#ffffff', strokeWidth: 0 }}
+                    activeDot={{ r: 3, fill: lineActual, strokeWidth: 0 }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
