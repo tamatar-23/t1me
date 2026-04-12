@@ -93,6 +93,21 @@ body {
   gap: 1.2rem;
 }
 
+.back-home-link {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  padding-right: 1.2rem;
+  border-right: 1px solid var(--border-mid);
+  transition: color 0.2s ease;
+}
+
+.back-home-link:hover {
+  color: var(--white);
+}
+
 .brand {
   font-size: 0.9rem;
   font-weight: 800;
